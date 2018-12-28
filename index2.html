@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie-edge">
+    <title>Hobnob</title>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.1.0/babel.min.js"></script>
+</head>
+<body>
+    <div id="renderTarget"></div>
+    <script type="text/babel">
+        const validator = {
+            email: (email) => /S+@\S+\.\S+/.test(email),
+            password: (password) => password.length > 11 && password.length <48
+        };
+
+        function getIndicatorColor(state){
+            if (state.valid === null || state.value.length === 0){
+                return 'transparent';
+            }
+            return state.valid ? 'green':'red';
+        }
+
+        class Input extends React.Component{
+            constructor(){
+                super();
+                this.state = {valid:null}
+            }
+            validate = (event) => {
+                const value = event.target.value;
+                const valid = validator[this.props.type](value);
+                this.setState({value,valid});
+            };
+            render(){
+                return <label>
+                    {this.props.label}
+                    <input onChange={this.validate} type={this.props.type}/>
+                    <div className="indicator" style={{
+                        height:"20px",
+                        width:"20px",
+                        backgroundColor: getIndicatorColor(this.state)
+                    }}></div>
+                </label>
+            }
+        }
+        function Button(props){
+            return <button>{props.title}</button>
+        }
+        class RegistrationForm extends React.Component {
+            handleRegistration = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            };
+            render() {
+                return (
+                    <form onSubmit={this.handleRegistration}>
+                        <Input label="Email" type="email"/>
+                        <Input label="Password" type="password"/>
+                        <Button title="Register"/>
+                    </form>
+                )
+            }
+        }
+        ReactDOM.render(<RegistrationForm />,
+            document.getElementById('renderTarget'));
+    </script>
+</body>
+</html>
